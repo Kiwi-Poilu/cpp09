@@ -5,6 +5,16 @@
 #include <map>
 #include <cstdlib>
 
+#define BAD_INPUT 0
+#define NEG_VALUE 1
+#define BIG_VALUE 2
+#define BAD_DATE  3
+
+#define GREEN   "\033[32m"      /* Green */
+#define RED     "\033[31m"      /* Red */
+#define RESET   "\033[0m"
+#define YELLOW  "\033[33m"      /* Yellow */
+
 int	checkDigits(int year, int month, int day)
 {
 	bool bi = false;
@@ -43,28 +53,32 @@ int	valiDate(std::string date)
 	std::string str;
 
 	if (date.size() != 10)
-	{
-		std::cout << "Error: bad date format" << std::endl;
 		return (false);
-	}
 	if (date.find_first_not_of("0123456789-") != std::string::npos)
-	{
-		std::cout << "Error: bad date format" << std::endl;
 		return (false);
-	}
 	while (std::getline(tmp, str, '-'))
 	{
 		ymd[i] = atoi(str.c_str());
 		if (ymd[i] == 0)
-		{
-			std::cout << "Error: ymd can't be 0." << std::endl;
 			return (false);
-		}
 		i++;
 	}
 	if (checkDigits(ymd[0], ymd[1], ymd[2]) == false)
 		return (false);
 	return (true);
+}
+
+int formatRet(int code, std::string input)
+{
+	if (code == BAD_INPUT)
+		std::cout << RED << "Error: bad input" << RESET << " => " << input << std::endl;
+	if (code == NEG_VALUE)
+		std::cout << RED << "Error: not a positive number." << RESET << std::endl;
+	if (code == BIG_VALUE)
+		std::cout << RED << "Error: too large a number." << RESET << std::endl;
+	if (code == BAD_DATE)
+		std::cout << RED << "Error: problem with the date." << RESET << std::endl;
+	return (false);
 }
 
 int	checkLine(std::string line, std::map<std::string, float> values)
@@ -76,37 +90,21 @@ int	checkLine(std::string line, std::map<std::string, float> values)
 
 	pos = line.find(" | ");
 	if (pos == std::string::npos)
-	{
-		std::cout << "Error: bad input => " << line << std::endl;
-		return (false);
-	}
+		return (formatRet(BAD_INPUT, line));
 	valueString = line.substr(pos + 3);
 	if (valueString.empty())
-	{
-		std::cout << "Error: bad input." << std::endl;
-		return (false);
-	}
+		return (formatRet(BAD_INPUT, line));
 	date = line.substr(0, pos);
-	// std::cout << date << "[" << valueString << "]\n";
 	std::istringstream checkValue(valueString);
 	checkValue >> std::noskipws >> value;
 	if (!checkValue.eof() || checkValue.fail())
-	{
-		std::cout << "Error: bad value" << std::endl;
-		return (false);
-	}
+		return (formatRet(BAD_INPUT, line));
 	if (value > 1000)
-	{
-		std::cout << "Error: too large a number." << std::endl;
-		return (false);
-	}
+		return (formatRet(BIG_VALUE, ""));
 	if (value < 0)
-	{
-		std::cout << "Error: not a positive number." << std::endl;
-		return (false);
-	}
+		return (formatRet(NEG_VALUE, ""));
 	if (!valiDate(date))
-		return (false);
+		return (formatRet(BAD_DATE, ""));
 	std::map<std::string, float>::iterator it;
 	it = values.find(date);
 	if (it == values.end())
@@ -114,25 +112,11 @@ int	checkLine(std::string line, std::map<std::string, float> values)
 		it = values.lower_bound(date);
 		if (it != values.begin())
 			it--;
+		std::cout << YELLOW << date << " => " << value << " = " << value * it->second << RESET << std::endl;
 	}
-	std::cout << date << " => " << value << " = " << value * it->second << std::endl;
+	else
+		std::cout << GREEN << date << " => " << value << " = " << value * it->second << RESET << std::endl;
 	return (true);
-}
-
-int	outputResults(char *input, std::map<std::string, float> values)
-{
-	std::ifstream provided;
-	std::string line;
-	provided.open(input);
-	if (!provided)
-	{
-		std::cout << "Error: could not open provided file." << std::endl;
-		return (1);
-	}
-	getline(provided, line);
-	while (getline(provided, line))
-		checkLine(line, values);
-	return (0);
 }
 
 int	fillValues(std::map<std::string, float> &values)
@@ -146,7 +130,7 @@ int	fillValues(std::map<std::string, float> &values)
 	if (!csv)
 	{
 		std::cout << "Error: could not open database." << std::endl;
-		return (1);
+		return (false);
 	}
 	getline(csv, line);
 	while (getline(csv, line))
@@ -156,21 +140,30 @@ int	fillValues(std::map<std::string, float> &values)
 		tmp >> value;
 		values.insert(std::make_pair(date, value));
 	}
-	return (0);
+	return (true);
 }
 
 int	main(int ac, char **av)
 {
 	std::map<std::string, float> values;
+	std::ifstream provided;
+	std::string line;
 
 	if (ac != 2)
 	{
-		std::cout << "Error: invalid number of arguments." << std::endl;
+		std::cout << "Error: could not open file." << std::endl;
 		return (0);
 	}
-	if (fillValues(values))
+	if (fillValues(values) == 0)
 		return (0);
-	// for (std::map<std::string, float>::iterator it = values.begin(); it != values.end(); it++)
-		// std::cout << it->first << " - " << it->second << std::endl;
-	outputResults(av[1], values);
+	provided.open(av[1]);
+	if (!provided)
+	{
+		std::cout << "Error: could not open file." << std::endl;
+		return (0);
+	}
+	getline(provided, line);
+	while (getline(provided, line))
+		checkLine(line, values);
+	return (0);
 }
