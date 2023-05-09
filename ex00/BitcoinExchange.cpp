@@ -8,16 +8,18 @@ Exchange::Exchange()
 	float value;
 
 	csv.open("data.csv");
-	if (!csv)	
-		std::cout << "Error: could not open data.csv." << std::endl;
-	while(getline(csv, line))
+	// if (!csv)
+	// 	throw 0;
+	getline(csv, line);
+	while (getline(csv, line))
 	{
-		getline(line, date, ',');
-		
-		std::cout << date << std::endl;
-		std::cout << line << std::endl;
-
+		std::stringstream tmp(line);
+		getline(tmp, date, ',');
+		tmp >> value;
+		values.insert({date, value});		
 	}
+	for (std::map<std::string, float>::iterator it = values.begin(); it != values.end(); it++)
+		std::cout << '|' << it->first << "->" << it->second << '|' << std::endl;
 }
 
 Exchange::Exchange( const Exchange & src )
