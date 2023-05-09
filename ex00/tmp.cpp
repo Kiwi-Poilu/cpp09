@@ -3,8 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
-#include <ctime>
-#include <algorithm>
+// #include <algorithm>
 
 int	checkMonthes(int ymd[3])
 {
@@ -103,7 +102,7 @@ int main(int ac, char **av)
 	{
 		if (line.find(" | ") == std::string::npos)
 			std::cout << "Error: bad input." << std::endl;
-		std::remove(line.begin(), line.end(), ' ');
+		// std::remove(line.begin(), line.end(), ' ');
 		std::stringstream tmp(line);
 		getline(tmp, date, '|');
 		tmp >> value;
@@ -115,7 +114,7 @@ int main(int ac, char **av)
 		// std::cout << "date = " << date << "|" << "value =" << value << '|' << std::endl;
 		isValidDate(date);
 		it = values.find(date);
-		std::cout << "Looking up date:"<< date << std::endl;
+		std::cout << "Looking up date:"<< date << '.' << std::endl;
 		if(it == values.end())
         {
 			std::cout << "Key-value pair not present in map" << std::endl;
