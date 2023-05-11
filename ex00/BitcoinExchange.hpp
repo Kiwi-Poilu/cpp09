@@ -2,11 +2,10 @@
 #define BTCEX_HPP
 
 #include <iostream>
-#include <string>
 #include <fstream>
 #include <sstream>
 #include <map>
-#include <cstdlib>
+#include <cstdlib> //atoi
 
 #define BAD_INPUT 0
 #define NEG_VALUE 1

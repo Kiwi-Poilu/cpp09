@@ -1,19 +1,4 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <map>
-#include <cstdlib>
-
-#define BAD_INPUT 0
-#define NEG_VALUE 1
-#define BIG_VALUE 2
-#define BAD_DATE  3
-
-#define GREEN   "\033[32m"      /* Green */
-#define RED     "\033[31m"      /* Red */
-#define RESET   "\033[0m"
-#define YELLOW  "\033[33m"      /* Yellow */
+#include "BitcoinExchange.hpp"
 
 int	checkDigits(int year, int month, int day)
 {
@@ -163,6 +148,10 @@ int	main(int ac, char **av)
 		return (0);
 	}
 	getline(provided, line);
+	if (line.compare("date | value") != 0)
+	{
+		std::cout << "Error: input file format is invalid" << std::endl;
+	}
 	while (getline(provided, line))
 		checkLine(line, values);
 	return (0);
