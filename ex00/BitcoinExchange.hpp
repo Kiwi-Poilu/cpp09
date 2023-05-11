@@ -1,18 +1,21 @@
+#ifndef BTCEX_HPP
+#define BTCEX_HPP
+
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <map>
 #include <sstream>
-#include <exception>
-#include <typeinfo>
+#include <map>
+#include <cstdlib>
 
-class Exchange
-{	
-	public:
-		Exchange();
-		Exchange(const Exchange &toCopy);
-		~Exchange();
-	private:
-		std::map<std::string, float> values;
-		Exchange &operator=(const Exchange &toCopy);
-};
+#define BAD_INPUT 0
+#define NEG_VALUE 1
+#define BIG_VALUE 2
+#define BAD_DATE  3
+
+#define GREEN   "\033[32m"      /* Green */
+#define RED     "\033[31m"      /* Red */
+#define RESET   "\033[0m"
+#define YELLOW  "\033[33m"      /* Yellow */
+
+#endif
